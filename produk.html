@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kelola Produk - Kasir UMKM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="style.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+  <h4 class="text-center text-primary mb-3">📦 Kelola Produk</h4>
+  <div class="card p-3 shadow-sm mb-4">
+    <input id="nama" class="form-control mb-2" placeholder="Nama Produk">
+    <input id="modal" class="form-control mb-2" placeholder="Harga Modal" type="number">
+    <input id="jual" class="form-control mb-2" placeholder="Harga Jual" type="number">
+    <input id="stok" class="form-control mb-2" placeholder="Stok" type="number">
+    <button onclick="tambahProduk()" class="btn btn-success w-100">+ Tambah Produk</button>
+  </div>
+
+  <table class="table table-bordered">
+    <thead><tr><th>Nama</th><th>Modal</th><th>Jual</th><th>Stok</th><th>Aksi</th></tr></thead>
+    <tbody id="tabelProduk"></tbody>
+  </table>
+  <a href="index.html" class="btn btn-secondary w-100 mt-3">← Kembali</a>
+</div>
+
+<script>
+let produk = JSON.parse(localStorage.getItem("produk") || "[]");
+
+function render() {
+  let html = "";
+  produk.forEach((p, i) => {
+    html += `<tr>
+      <td>${p.nama}</td>
+      <td>Rp${p.modal}</td>
+      <td>Rp${p.jual}</td>
+      <td>${p.stok}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="hapus(${i})">Hapus</button></td>
+    </tr>`;
+  });
+  document.getElementById("tabelProduk").innerHTML = html;
+}
+
+function tambahProduk() {
+  let nama = document.getElementById("nama").value;
+  let modal = parseInt(document.getElementById("modal").value);
+  let jual = parseInt(document.getElementById("jual").value);
+  let stok = parseInt(document.getElementById("stok").value);
+  if (!nama || isNaN(modal) || isNaN(jual) || isNaN(stok)) return alert("Lengkapi semua kolom!");
+  produk.push({ nama, modal, jual, stok });
+  localStorage.setItem("produk", JSON.stringify(produk));
+  render();
+  document.getElementById("nama").value = "";
+  document.getElementById("modal").value = "";
+  document.getElementById("jual").value = "";
+  document.getElementById("stok").value = "";
+}
+
+function hapus(i) {
+  if (confirm("Hapus produk ini?")) {
+    produk.splice(i, 1);
+    localStorage.setItem("produk", JSON.stringify(produk));
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kasir Penjualan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="style.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+  <h4 class="text-center text-success mb-3">🛒 Kasir Penjualan</h4>
+
+  <div class="card p-3 shadow-sm mb-4">
+    <select id="produk" class="form-select mb-2"></select>
+    <input id="jumlah" type="number" class="form-control mb-2" placeholder="Jumlah">
+    <button onclick="jual()" class="btn btn-success w-100">Jual</button>
+  </div>
+
+  <table class="table table-bordered">
+    <thead><tr><th>Produk</th><th>Jumlah</th><th>Total</th><th>Untung</th></tr></thead>
+    <tbody id="tabelJual"></tbody>
+  </table>
+  <a href="index.html" class="btn btn-secondary w-100 mt-3">← Kembali</a>
+</div>
+
+<script>
+let produk = JSON.parse(localStorage.getItem("produk") || "[]");
+let riwayat = JSON.parse(localStorage.getItem("riwayat") || "[]");
+let pemasukan = JSON.parse(localStorage.getItem("pemasukan") || "[]");
+
+function isiProduk() {
+  let html = produk.map((p, i) => `<option value="${i}">${p.nama} (Stok: ${p.stok})</option>`).join("");
+  document.getElementById("produk").innerHTML = html;
+}
+
+function jual() {
+  let i = parseInt(document.getElementById("produk").value);
+  let jumlah = parseInt(document.getElementById("jumlah").value);
+  if (isNaN(jumlah) || jumlah <= 0) return alert("Masukkan jumlah valid.");
+  if (produk[i].stok < jumlah) return alert("Stok tidak cukup.");
+
+  let total = jumlah * produk[i].jual;
+  let untung = jumlah * (produk[i].jual - produk[i].modal);
+  produk[i].stok -= jumlah;
+  pemasukan.push({ tanggal: new Date().toISOString(), jumlah: total });
+  riwayat.push({ tanggal: new Date().toISOString(), jenis: "penjualan", produk: produk[i].nama, jumlah, total, untung });
+
+  localStorage.setItem("produk", JSON.stringify(produk));
+  localStorage.setItem("pemasukan", JSON.stringify(pemasukan));
+  localStorage.setItem("riwayat", JSON.stringify(riwayat));
+  render();
+  isiProduk();
+  document.getElementById("jumlah").value = "";
+}
+
+function render() {
+  let html = "";
+  let transaksi = riwayat.filter(r => r.jenis === "penjualan");
+  transaksi.forEach(r => {
+    html += `<tr>
+      <td>${r.produk}</td>
+      <td>${r.jumlah}</td>
+      <td>Rp${r.total}</td>
+      <td>Rp${r.untung}</td>
+    </tr>`;
+  });
+  document.getElementById("tabelJual").innerHTML = html;
+}
+
+isiProduk();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Riwayat Transaksi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="style.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+  <h4 class="text-center text-secondary mb-3">📜 Riwayat Transaksi</h4>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr><th>Tanggal</th><th>Jenis</th><th>Deskripsi</th><th>Jumlah</th></tr>
+    </thead>
+    <tbody id="tabelRiwayat"></tbody>
+  </table>
+
+  <a href="index.html" class="btn btn-secondary w-100 mt-3">← Kembali</a>
+</div>
+
+<script>
+let riwayat = JSON.parse(localStorage.getItem("riwayat") || "[]");
+
+function render() {
+  let html = "";
+  riwayat.forEach(r => {
+    let tgl = new Date(r.tanggal).toLocaleString("id-ID");
+    let desc = r.jenis === "penjualan" ? r.produk + " (" + r.jumlah + "x)" : r.keterangan;
+    html += `<tr>
+      <td>${tgl}</td>
+      <td>${r.jenis}</td>
+      <td>${desc}</td>
+      <td>Rp${r.total || r.jumlah}</td>
+    </tr>`;
+  });
+  document.getElementById("tabelRiwayat").innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
